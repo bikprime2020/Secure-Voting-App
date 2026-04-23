@@ -25,6 +25,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
+import { Providers } from '@/components/providers'
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,7 +35,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark bg-[#030014]">
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-[#030014] text-white min-h-screen`}>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

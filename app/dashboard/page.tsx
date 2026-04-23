@@ -55,13 +55,18 @@ const activeElections = [
   }
 ]
 
+import { useSession } from "next-auth/react"
+
 export default function DashboardPage() {
+  const { data: session } = useSession()
+  const firstName = session?.user?.name?.split(" ")[0] || "User"
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-          Welcome back, <span className="gradient-text">John</span>
+          Welcome back, <span className="gradient-text">{firstName}</span>
         </h1>
         <p className="text-muted-foreground mt-1">{"Here's what's happening with your elections"}</p>
       </div>

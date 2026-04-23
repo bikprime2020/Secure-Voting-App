@@ -17,7 +17,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -33,6 +33,10 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { data: session } = useSession()
+
+  const userName = session?.user?.name || "User"
+  const userEmail = session?.user?.email || "user@example.com"
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -102,8 +106,8 @@ export default function DashboardLayout({
                 <User className="h-5 w-5 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">John Doe</p>
-                <p className="text-xs text-muted-foreground truncate">john@example.com</p>
+                <p className="text-sm font-medium text-foreground truncate">{userName}</p>
+                <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
               </div>
             </div>
             <Button 
@@ -141,7 +145,7 @@ export default function DashboardLayout({
                 <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center">
                   <User className="h-4 w-4 text-primary" />
                 </div>
-                <span className="text-sm font-medium text-foreground">John Doe</span>
+                <span className="text-sm font-medium text-foreground">{userName}</span>
               </div>
             </div>
           </div>
