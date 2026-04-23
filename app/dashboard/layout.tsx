@@ -131,9 +131,12 @@ export default function DashboardLayout({
           {/* User Section */}
           <div className="p-4 border-t border-border/30">
             <div className="flex items-center gap-3 px-4 py-3 glass rounded-xl mb-2">
-              <div className="h-10 w-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <User className="h-5 w-5 text-primary" />
-              </div>
+              <Avatar className="h-10 w-10 rounded-full border-none">
+                <AvatarImage src={session?.user?.image || ""} />
+                <AvatarFallback className="bg-primary/20 text-primary rounded-full font-bold">
+                  {userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+                </AvatarFallback>
+              </Avatar>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-foreground truncate">{userName}</p>
                 <p className="text-xs text-muted-foreground truncate">{userEmail}</p>
@@ -216,8 +219,8 @@ export default function DashboardLayout({
                   <button className="flex items-center gap-3 glass rounded-xl px-3 py-2 hover:bg-secondary/30 transition-all outline-none">
                     <Avatar className="h-8 w-8 rounded-lg border-none">
                       <AvatarImage src={session?.user?.image || ""} />
-                      <AvatarFallback className="bg-primary/20 text-primary rounded-lg">
-                        <User className="h-4 w-4" />
+                      <AvatarFallback className="bg-primary/20 text-primary rounded-lg font-bold text-xs">
+                        {userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                       </AvatarFallback>
                     </Avatar>
                     <span className="hidden sm:inline text-sm font-medium text-foreground">{userName}</span>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +22,15 @@ export default function SettingsPage() {
     name: session?.user?.name || "User",
     email: session?.user?.email || "user@example.com"
   })
+
+  useEffect(() => {
+    if (session?.user) {
+      setProfile({
+        name: session.user.name || "User",
+        email: session.user.email || "user@example.com"
+      })
+    }
+  }, [session])
 
   const handleSave = async () => {
     setIsSaving(true)

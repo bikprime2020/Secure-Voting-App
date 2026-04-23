@@ -43,6 +43,7 @@ export default function RegisterPage() {
     // In a real app, you would register the user in the database here first
     // For now, we sign in using the dummy credentials provider
     await signIn("credentials", {
+      name: formData.name,
       email: formData.email,
       password: formData.password,
       callbackUrl: "/dashboard",

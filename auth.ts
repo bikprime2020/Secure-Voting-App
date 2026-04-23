@@ -19,7 +19,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (credentials?.email && credentials?.password) {
           return { 
             id: "1", 
-            name: (credentials.email as string).split('@')[0], 
+            name: (credentials.name as string) || (credentials.email as string).split('@')[0], 
             email: credentials.email as string 
           }
         }
