@@ -13,13 +13,14 @@ import {
   Smartphone,
   Save
 } from "lucide-react"
-import { signOut } from "next-auth/react"
+import { signOut, useSession } from "next-auth/react"
 
 export default function SettingsPage() {
+  const { data: session } = useSession()
   const [isSaving, setIsSaving] = useState(false)
   const [profile, setProfile] = useState({
-    name: "John Doe",
-    email: "john@example.com"
+    name: session?.user?.name || "User",
+    email: session?.user?.email || "user@example.com"
   })
 
   const handleSave = async () => {
