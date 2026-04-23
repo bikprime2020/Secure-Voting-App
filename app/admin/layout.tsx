@@ -19,6 +19,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { signOut } from "next-auth/react"
 
 const navigation = [
   { name: "Overview", href: "/admin", icon: LayoutDashboard },
@@ -113,12 +114,14 @@ export default function AdminLayout({
                 <p className="text-xs text-muted-foreground truncate">admin@securevote.com</p>
               </div>
             </div>
-            <Link href="/login">
-              <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10">
-                <LogOut className="h-5 w-5" />
-                Sign out
-              </Button>
-            </Link>
+            <Button 
+              variant="ghost" 
+              className="w-full justify-start gap-3 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={() => signOut({ callbackUrl: '/login' })}
+            >
+              <LogOut className="h-5 w-5" />
+              Sign out
+            </Button>
           </div>
         </div>
       </aside>

@@ -13,6 +13,7 @@ import {
   Smartphone,
   Save
 } from "lucide-react"
+import { signOut } from "next-auth/react"
 
 export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false)
@@ -178,7 +179,17 @@ export default function SettingsPage() {
               <p className="font-medium text-card-foreground">Delete Account</p>
               <p className="text-sm text-muted-foreground">Permanently delete your account and all data</p>
             </div>
-            <Button variant="destructive" size="sm">Delete Account</Button>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to permanently delete your account?")) {
+                  signOut({ callbackUrl: '/' })
+                }
+              }}
+            >
+              Delete Account
+            </Button>
           </div>
         </CardContent>
       </Card>
