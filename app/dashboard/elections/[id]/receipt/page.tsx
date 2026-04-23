@@ -36,10 +36,14 @@ export default function ReceiptPage() {
     blockchainRef: `0x${Math.random().toString(16).substring(2, 10)}...${Math.random().toString(16).substring(2, 6)}`
   }
 
+  const handleDownload = () => {
+    window.print()
+  }
+
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      {/* Success Message */}
-      <div className="text-center py-8">
+    <div className="max-w-2xl mx-auto space-y-6 pb-12">
+      {/* Success Message - Hidden on print */}
+      <div className="text-center py-8 print:hidden">
         <div className="h-20 w-20 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6">
           <CheckCircle2 className="h-10 w-10 text-accent" />
         </div>
@@ -51,85 +55,88 @@ export default function ReceiptPage() {
         </p>
       </div>
 
-      {/* Tracking ID Card */}
-      <Card className="border-primary">
-        <CardHeader className="text-center">
-          <CardTitle>Your Tracking ID</CardTitle>
-          <CardDescription>
-            Save this ID to verify your vote was recorded correctly
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-center gap-3 p-4 bg-secondary rounded-lg">
-            <code className="text-lg sm:text-xl font-mono font-bold text-card-foreground">
-              {trackingId}
-            </code>
-            <button 
-              onClick={copyToClipboard}
-              className="p-2 hover:bg-muted rounded-md transition-colors"
-              title="Copy to clipboard"
-            >
-              {copied ? (
-                <CheckCircle2 className="h-5 w-5 text-accent" />
-              ) : (
-                <Copy className="h-5 w-5 text-muted-foreground" />
-              )}
-            </button>
-          </div>
-          
-          <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={copyToClipboard}>
-              <Copy className="h-4 w-4 mr-2" />
-              {copied ? "Copied!" : "Copy ID"}
-            </Button>
-            <Button variant="outline" className="flex-1">
-              <Download className="h-4 w-4 mr-2" />
-              Download
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Printable Receipt Container */}
+      <div className="space-y-6 print:m-0 print:p-0">
+        {/* Tracking ID Card */}
+        <Card className="border-primary print:border-slate-200">
+          <CardHeader className="text-center">
+            <CardTitle>Your Tracking ID</CardTitle>
+            <CardDescription className="print:text-slate-500">
+              Save this ID to verify your vote was recorded correctly
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-center gap-3 p-4 bg-secondary rounded-lg print:bg-slate-100 print:border">
+              <code className="text-lg sm:text-xl font-mono font-bold text-card-foreground print:text-black">
+                {trackingId}
+              </code>
+              <button 
+                onClick={copyToClipboard}
+                className="p-2 hover:bg-muted rounded-md transition-colors print:hidden"
+                title="Copy to clipboard"
+              >
+                {copied ? (
+                  <CheckCircle2 className="h-5 w-5 text-accent" />
+                ) : (
+                  <Copy className="h-5 w-5 text-muted-foreground" />
+                )}
+              </button>
+            </div>
+            
+            <div className="flex gap-2 print:hidden">
+              <Button variant="outline" className="flex-1" onClick={copyToClipboard}>
+                <Copy className="h-4 w-4 mr-2" />
+                {copied ? "Copied!" : "Copy ID"}
+              </Button>
+              <Button variant="outline" className="flex-1" onClick={handleDownload}>
+                <Download className="h-4 w-4 mr-2" />
+                Download PDF
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Receipt Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Vote Receipt
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4">
-            <div className="flex justify-between py-3 border-b border-border">
-              <span className="text-muted-foreground">Election</span>
-              <span className="font-medium text-card-foreground">{receiptData.electionTitle}</span>
+        {/* Receipt Details */}
+        <Card className="print:border-slate-200">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Vote Receipt
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4">
+              <div className="flex justify-between py-3 border-b border-border print:border-slate-100">
+                <span className="text-muted-foreground print:text-slate-500">Election</span>
+                <span className="font-medium text-card-foreground print:text-black">{receiptData.electionTitle}</span>
+              </div>
+              <div className="flex justify-between py-3 border-b border-border print:border-slate-100">
+                <span className="text-muted-foreground print:text-slate-500">Organization</span>
+                <span className="font-medium text-card-foreground print:text-black">{receiptData.organization}</span>
+              </div>
+              <div className="flex justify-between py-3 border-b border-border print:border-slate-100">
+                <span className="text-muted-foreground print:text-slate-500">Timestamp</span>
+                <span className="font-medium text-card-foreground print:text-black">{receiptData.votedAt}</span>
+              </div>
+              <div className="flex justify-between py-3 border-b border-border print:border-slate-100">
+                <span className="text-muted-foreground print:text-slate-500">Encryption</span>
+                <span className="font-medium text-card-foreground print:text-black">{receiptData.encryptionMethod}</span>
+              </div>
+              <div className="flex justify-between py-3 border-b border-border print:border-slate-100">
+                <span className="text-muted-foreground print:text-slate-500">Verification</span>
+                <span className="font-medium text-card-foreground print:text-black">{receiptData.verificationMethod}</span>
+              </div>
+              <div className="flex justify-between py-3">
+                <span className="text-muted-foreground print:text-slate-500">Blockchain Ref</span>
+                <code className="font-mono text-sm text-card-foreground print:text-black">{receiptData.blockchainRef}</code>
+              </div>
             </div>
-            <div className="flex justify-between py-3 border-b border-border">
-              <span className="text-muted-foreground">Organization</span>
-              <span className="font-medium text-card-foreground">{receiptData.organization}</span>
-            </div>
-            <div className="flex justify-between py-3 border-b border-border">
-              <span className="text-muted-foreground">Timestamp</span>
-              <span className="font-medium text-card-foreground">{receiptData.votedAt}</span>
-            </div>
-            <div className="flex justify-between py-3 border-b border-border">
-              <span className="text-muted-foreground">Encryption</span>
-              <span className="font-medium text-card-foreground">{receiptData.encryptionMethod}</span>
-            </div>
-            <div className="flex justify-between py-3 border-b border-border">
-              <span className="text-muted-foreground">Verification</span>
-              <span className="font-medium text-card-foreground">{receiptData.verificationMethod}</span>
-            </div>
-            <div className="flex justify-between py-3">
-              <span className="text-muted-foreground">Blockchain Ref</span>
-              <code className="font-mono text-sm text-card-foreground">{receiptData.blockchainRef}</code>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Security Info */}
-      <Card className="bg-primary/5 border-primary/20">
+      {/* Security Info - Hidden on print */}
+      <Card className="bg-primary/5 border-primary/20 print:hidden">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <Shield className="h-5 w-5 text-primary mt-0.5" />
@@ -145,8 +152,8 @@ export default function ReceiptPage() {
         </CardContent>
       </Card>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      {/* Actions - Hidden on print */}
+      <div className="flex flex-col sm:flex-row gap-3 print:hidden">
         <Link href="/dashboard" className="flex-1">
           <Button variant="outline" className="w-full">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -159,6 +166,26 @@ export default function ReceiptPage() {
           </Button>
         </Link>
       </div>
+
+      {/* Print-only CSS */}
+      <style jsx global>{`
+        @media print {
+          body {
+            background: white !important;
+            color: black !important;
+          }
+          aside, header, footer, .print\\:hidden {
+            display: none !important;
+          }
+          main {
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          .lg\\:pl-64 {
+            padding-left: 0 !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
