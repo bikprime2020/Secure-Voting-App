@@ -26,6 +26,7 @@ export const viewport: Viewport = {
 }
 
 import { Providers } from '@/components/providers'
+import { BackgroundPaths } from '@/components/ui/background-paths'
 
 export default function RootLayout({
   children,
@@ -34,7 +35,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-transparent text-white min-h-screen`}>
+      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-transparent text-white min-h-screen relative`}>
+        <BackgroundPaths />
         <Providers>
           {children}
         </Providers>

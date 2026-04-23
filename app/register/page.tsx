@@ -54,15 +54,15 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex flex-1 bg-primary items-center justify-center p-8">
+      <div className="hidden lg:flex flex-1 bg-transparent items-center justify-center p-8">
         <div className="max-w-md text-center">
-          <div className="h-24 w-24 bg-primary-foreground/10 rounded-2xl flex items-center justify-center mx-auto mb-8">
-            <ShieldCheck className="h-12 w-12 text-primary-foreground" />
+          <div className="h-24 w-24 bg-primary/20 rounded-2xl flex items-center justify-center mx-auto mb-8">
+            <ShieldCheck className="h-12 w-12 text-primary" />
           </div>
-          <h2 className="text-3xl font-bold text-primary-foreground mb-4 text-balance">
+          <h2 className="text-3xl font-bold text-foreground mb-4 text-balance">
             Your Voice Matters
           </h2>
-          <p className="text-primary-foreground/80 text-pretty">
+          <p className="text-muted-foreground text-pretty">
             Create your account to participate in secure, transparent elections. 
             Every vote is encrypted and verified with cryptographic proofs.
           </p>
@@ -74,8 +74,8 @@ export default function RegisterPage() {
               "Real-time result tracking",
               "Multi-factor authentication"
             ].map((feature) => (
-              <div key={feature} className="flex items-center gap-3 text-primary-foreground/80">
-                <CheckCircle2 className="h-5 w-5 text-primary-foreground" />
+              <div key={feature} className="flex items-center gap-3 text-muted-foreground">
+                <CheckCircle2 className="h-5 w-5 text-primary" />
                 <span>{feature}</span>
               </div>
             ))}

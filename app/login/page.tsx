@@ -37,11 +37,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex relative">
-      {/* Background */}
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/15 rounded-full blur-3xl" />
-      </div>
 
       {/* Left Panel - Form */}
       <div className="flex-1 flex items-center justify-center p-8">
