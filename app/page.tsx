@@ -6,12 +6,12 @@ import { Stats } from "@/components/stats"
 import { Security } from "@/components/security"
 import { CTA } from "@/components/cta"
 import { Footer } from "@/components/footer"
-import { PaperBackground } from "@/components/ui/background-paper-shaders"
+import { BackgroundPaths } from "@/components/ui/background-paths"
 
 export default function Home() {
   return (
     <main className="min-h-screen text-white relative">
-      <PaperBackground />
+      <BackgroundPaths />
       
       <div className="relative z-10">
         <Navbar />
