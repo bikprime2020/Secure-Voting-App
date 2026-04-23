@@ -18,6 +18,15 @@ import {
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { signOut, useSession } from "next-auth/react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -35,7 +44,7 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { data: session } = useSession()
 
-  const userName = session?.user?.name || "User"
+  const userName = session?.user?.name === "Demo User" ? (session?.user?.email?.split('@')[0] || "User") : (session?.user?.name || "User")
   const userEmail = session?.user?.email || "user@example.com"
 
   return (
@@ -137,16 +146,72 @@ export default function DashboardLayout({
             <div className="flex-1" />
 
             <div className="flex items-center gap-4">
-              <button className="relative p-2.5 glass rounded-xl text-muted-foreground hover:text-foreground transition-colors">
-                <Bell className="h-5 w-5" />
-                <span className="absolute top-2 right-2 h-2 w-2 bg-accent rounded-full animate-pulse" />
-              </button>
-              <div className="hidden sm:flex items-center gap-3 glass rounded-xl px-3 py-2">
-                <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                  <User className="h-4 w-4 text-primary" />
-                </div>
-                <span className="text-sm font-medium text-foreground">{userName}</span>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="relative p-2.5 glass rounded-xl text-muted-foreground hover:text-foreground transition-colors">
+                    <Bell className="h-5 w-5" />
+                    <span className="absolute top-2 right-2 h-2 w-2 bg-accent rounded-full animate-pulse" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80 glass-strong border-border/30">
+                  <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="py-2">
+                    <div className="px-4 py-3 hover:bg-secondary/50 cursor-pointer transition-colors border-b border-border/10">
+                      <p className="text-sm font-medium">New Election Started</p>
+                      <p className="text-xs text-muted-foreground mt-1">Student Council President 2026 is now live.</p>
+                      <p className="text-[10px] text-muted-foreground mt-2">2 hours ago</p>
+                    </div>
+                    <div className="px-4 py-3 hover:bg-secondary/50 cursor-pointer transition-colors">
+                      <p className="text-sm font-medium">Vote Recorded</p>
+                      <p className="text-xs text-muted-foreground mt-1">Your vote for Budget Proposal has been verified.</p>
+                      <p className="text-[10px] text-muted-foreground mt-2">5 hours ago</p>
+                    </div>
+                  </div>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem className="justify-center text-primary font-medium cursor-pointer">
+                    View all notifications
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-3 glass rounded-xl px-3 py-2 hover:bg-secondary/30 transition-all outline-none">
+                    <Avatar className="h-8 w-8 rounded-lg border-none">
+                      <AvatarImage src={session?.user?.image || ""} />
+                      <AvatarFallback className="bg-primary/20 text-primary rounded-lg">
+                        <User className="h-4 w-4" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="hidden sm:inline text-sm font-medium text-foreground">{userName}</span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 glass-strong border-border/30">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profile</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard/settings" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="text-destructive focus:text-destructive cursor-pointer"
+                    onClick={() => signOut({ callbackUrl: '/login' })}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </header>

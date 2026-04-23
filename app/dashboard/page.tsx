@@ -59,7 +59,8 @@ import { useSession } from "next-auth/react"
 
 export default function DashboardPage() {
   const { data: session } = useSession()
-  const firstName = session?.user?.name?.split(" ")[0] || "User"
+  const rawName = session?.user?.name === "Demo User" ? session?.user?.email?.split('@')[0] : session?.user?.name
+  const firstName = rawName?.split(" ")[0] || "User"
 
   return (
     <div className="space-y-8">
