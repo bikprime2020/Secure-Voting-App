@@ -56,7 +56,7 @@ const useInstanceId = (): string => {
 
 export function EtherealShadow({
     sizing = 'fill',
-    color = 'rgba(128, 128, 128, 1)',
+    color = 'rgba(15, 2, 50, 0.9)',
     animation,
     noise,
     style,
@@ -107,7 +107,7 @@ export function EtherealShadow({
                 overflow: "hidden",
                 position: "relative",
                 width: "100%",
-                height: "100%",
+                minHeight: "100vh",
                 ...style
             }}
         >

@@ -34,13 +34,13 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="dark bg-[#030014]">
+    <html lang="en" className="dark">
       <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-[#030014] text-white min-h-screen`}>
         <Providers>
           <EtherealShadow 
-            color="rgba(10, 0, 40, 0.9)"
-            animation={{ scale: 30, speed: 10 }}
-            noise={{ opacity: 0.05, scale: 0.5 }}
+            color="rgba(15, 2, 50, 0.95)"
+            animation={{ scale: 60, speed: 15 }}
+            noise={{ opacity: 0.08, scale: 0.6 }}
             className="min-h-screen"
           >
             {children}
