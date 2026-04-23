@@ -70,8 +70,8 @@ export function EtheralShadow({
     const hueRotateMotionValue = useMotionValue(180);
     const hueRotateAnimation = useRef<AnimationPlaybackControls | null>(null);
 
-    const displacementScale = animation ? mapRange(animation.scale, 1, 100, 20, 100) : 0;
-    const animationDuration = animation ? mapRange(animation.speed, 1, 100, 1000, 50) : 1;
+    const displacementScale = animation ? mapRange(animation.scale, 1, 100, 30, 150) : 0;
+    const animationDuration = animation ? mapRange(animation.speed, 1, 100, 10, 2) : 1;
 
     useEffect(() => {
         if (feColorMatrixRef.current && animationEnabled) {
@@ -80,7 +80,7 @@ export function EtheralShadow({
             }
             hueRotateMotionValue.set(0);
             hueRotateAnimation.current = animate(hueRotateMotionValue, 360, {
-                duration: animationDuration / 25,
+                duration: animationDuration,
                 repeat: Infinity,
                 repeatType: "loop",
                 repeatDelay: 0,
