@@ -35,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-[#030014] text-white min-h-screen`}>
+      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-transparent text-white min-h-screen`}>
         <Providers>
           <EtherealShadow 
             color="rgba(15, 2, 50, 0.95)"
