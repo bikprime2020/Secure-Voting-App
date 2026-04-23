@@ -4,116 +4,127 @@ import { useRef, useMemo } from "react"
 import { useFrame, Canvas } from "@react-three/fiber"
 import * as THREE from "three"
 
-// Custom shader material for advanced effects
-const vertexShader = `
-  uniform float time;
-  uniform float intensity;
+// Advanced Mesh Gradient Shader
+const meshVertexShader = `
   varying vec2 vUv;
-  varying vec3 vPosition;
-  
   void main() {
     vUv = uv;
-    vPosition = position;
-    
-    vec3 pos = position;
-    pos.y += sin(pos.x * 10.0 + time) * 0.1 * intensity;
-    pos.x += cos(pos.y * 8.0 + time * 1.5) * 0.05 * intensity;
-    
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `
 
-const fragmentShader = `
+const meshFragmentShader = `
   uniform float time;
-  uniform float intensity;
-  uniform vec3 color1;
-  uniform vec3 color2;
+  uniform vec3 colors[4];
   varying vec2 vUv;
-  varying vec3 vPosition;
+
+  vec3 mixColors(vec2 uv, float time) {
+    float t = time * 0.2;
+    
+    // Distort UVs
+    vec2 distort = uv;
+    distort.x += sin(uv.y * 5.0 + t) * 0.1;
+    distort.y += cos(uv.x * 5.0 + t) * 0.1;
+    
+    float w1 = sin(distort.x * 2.0 + t) * 0.5 + 0.5;
+    float w2 = cos(distort.y * 3.0 - t * 1.5) * 0.5 + 0.5;
+    
+    vec3 c1 = mix(colors[0], colors[1], w1);
+    vec3 c2 = mix(colors[2], colors[3], w2);
+    
+    return mix(c1, c2, (w1 + w2) * 0.5);
+  }
+
+  void main() {
+    vec3 color = mixColors(vUv, time);
+    
+    // Add subtle grain/noise
+    float grain = fract(sin(dot(vUv, vec2(12.9898, 78.233))) * 43758.5453);
+    color += (grain - 0.5) * 0.05;
+    
+    gl_FragColor = vec4(color, 1.0);
+  }
+`
+
+// Dot Orbit Shader
+const dotVertexShader = `
+  uniform float time;
+  uniform float speed;
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+const dotFragmentShader = `
+  uniform float time;
+  uniform vec3 dotColor;
+  varying vec2 vUv;
   
   void main() {
-    vec2 uv = vUv;
+    vec2 uv = vUv * 40.0; // Density
+    vec2 grid = fract(uv) - 0.5;
+    vec2 id = floor(uv);
     
-    // Create animated noise pattern
-    float noise = sin(uv.x * 20.0 + time) * cos(uv.y * 15.0 + time * 0.8);
-    noise += sin(uv.x * 35.0 - time * 2.0) * cos(uv.y * 25.0 + time * 1.2) * 0.5;
+    // Orbit motion
+    float t = time * 0.5;
+    vec2 offset = vec2(sin(t + id.y * 0.5), cos(t + id.x * 0.5)) * 0.3;
     
-    // Mix colors based on noise and position
-    vec3 color = mix(color1, color2, noise * 0.5 + 0.5);
-    color = mix(color, vec3(1.0), pow(abs(noise), 2.0) * intensity);
+    float dist = length(grid - offset);
+    float mask = smoothstep(0.1, 0.05, dist);
     
-    // Add glow effect
-    float glow = 1.0 - length(uv - 0.5) * 2.0;
-    glow = pow(glow, 2.0);
-    
-    gl_FragColor = vec4(color * glow, glow * 0.8);
+    gl_FragColor = vec4(dotColor, mask * 0.3);
   }
 `
 
-export function ShaderPlane({
-  position,
-  color1 = "#ff5722",
-  color2 = "#ffffff",
-}: {
-  position: [number, number, number]
-  color1?: string
-  color2?: string
-}) {
+export function MeshGradient({ colors = ["#000000", "#1a1a1a", "#333333", "#ffffff"] }) {
   const mesh = useRef<THREE.Mesh>(null)
-
-  const uniforms = useMemo(
-    () => ({
-      time: { value: 0 },
-      intensity: { value: 1.0 },
-      color1: { value: new THREE.Color(color1) },
-      color2: { value: new THREE.Color(color2) },
-    }),
-    [color1, color2],
-  )
+  const uniforms = useMemo(() => ({
+    time: { value: 0 },
+    colors: { value: colors.map(c => new THREE.Color(c)) }
+  }), [colors])
 
   useFrame((state) => {
     if (mesh.current) {
       uniforms.time.value = state.clock.elapsedTime
-      uniforms.intensity.value = 1.0 + Math.sin(state.clock.elapsedTime * 2) * 0.3
     }
   })
 
   return (
-    <mesh ref={mesh} position={position}>
-      <planeGeometry args={[2, 2, 32, 32]} />
+    <mesh ref={mesh}>
+      <planeGeometry args={[10, 10]} />
       <shaderMaterial
+        vertexShader={meshVertexShader}
+        fragmentShader={meshFragmentShader}
         uniforms={uniforms}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-        transparent
-        side={THREE.DoubleSide}
       />
     </mesh>
   )
 }
 
-export function EnergyRing({
-  radius = 1,
-  position = [0, 0, 0],
-}: {
-  radius?: number
-  position?: [number, number, number]
-}) {
+export function DotOrbit({ color = "#ffffff" }) {
   const mesh = useRef<THREE.Mesh>(null)
+  const uniforms = useMemo(() => ({
+    time: { value: 0 },
+    dotColor: { value: new THREE.Color(color) }
+  }), [color])
 
   useFrame((state) => {
     if (mesh.current) {
-      mesh.current.rotation.z = state.clock.elapsedTime
-      if (mesh.current.material instanceof THREE.MeshBasicMaterial) {
-        mesh.current.material.opacity = 0.5 + Math.sin(state.clock.elapsedTime * 3) * 0.3
-      }
+      uniforms.time.value = state.clock.elapsedTime
     }
   })
 
   return (
-    <mesh ref={mesh} position={position}>
-      <ringGeometry args={[radius * 0.8, radius, 32]} />
-      <meshBasicMaterial color="#ff5722" transparent opacity={0.6} side={THREE.DoubleSide} />
+    <mesh ref={mesh} position={[0, 0, 0.1]}>
+      <planeGeometry args={[10, 10]} />
+      <shaderMaterial
+        vertexShader={dotVertexShader}
+        fragmentShader={dotFragmentShader}
+        uniforms={uniforms}
+        transparent
+      />
     </mesh>
   )
 }
@@ -121,12 +132,9 @@ export function EnergyRing({
 export function PaperBackground() {
   return (
     <div className="fixed inset-0 z-[-1] pointer-events-none">
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-        <color attach="background" args={["#000000"]} />
-        <ambientLight intensity={0.5} />
-        <ShaderPlane position={[0, 0, 0]} color1="#1a1a1a" color2="#333333" />
-        <EnergyRing radius={2.5} position={[0, 0, -1]} />
-        <EnergyRing radius={3.5} position={[0, 0, -2]} />
+      <Canvas camera={{ position: [0, 0, 1] }}>
+        <MeshGradient colors={["#000000", "#0a0a0a", "#111111", "#1a1a1a"]} />
+        <DotOrbit color="#333333" />
       </Canvas>
     </div>
   )
