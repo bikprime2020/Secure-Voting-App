@@ -3,10 +3,12 @@
 import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ShieldCheck, Menu, X } from "lucide-react"
+import { ShieldCheck, Menu, X, LayoutDashboard } from "lucide-react"
+import { useSession } from "next-auth/react"
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { data: session } = useSession()
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#030014]/80 backdrop-blur-xl border-b border-white/10">
@@ -38,16 +40,27 @@ export function Navbar() {
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/login">
-              <Button variant="ghost" className="text-neutral-300 hover:text-white hover:bg-white/10">
-                Log in
-              </Button>
-            </Link>
-            <Link href="/register">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                Get Started
-              </Button>
-            </Link>
+            {session ? (
+              <Link href="/dashboard">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2">
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
+                </Button>
+              </Link>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" className="text-neutral-300 hover:text-white hover:bg-white/10">
+                    Log in
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Get Started
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -97,12 +110,23 @@ export function Navbar() {
                 About
               </Link>
               <div className="flex flex-col gap-2 pt-4 mt-2 border-t border-white/10">
-                <Link href="/login">
-                  <Button variant="ghost" className="w-full justify-start text-neutral-300 hover:text-white hover:bg-white/10">Log in</Button>
-                </Link>
-                <Link href="/register">
-                  <Button className="w-full bg-primary hover:bg-primary/90">Get Started</Button>
-                </Link>
+                {session ? (
+                  <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full bg-primary hover:bg-primary/90 gap-2">
+                      <LayoutDashboard className="h-4 w-4" />
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="ghost" className="w-full justify-start text-neutral-300 hover:text-white hover:bg-white/10">Log in</Button>
+                    </Link>
+                    <Link href="/register" onClick={() => setIsMenuOpen(false)}>
+                      <Button className="w-full bg-primary hover:bg-primary/90">Get Started</Button>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </div>
