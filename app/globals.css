@@ -84,9 +84,12 @@
   * {
     @apply border-border outline-ring/50;
   }
-  html, body {
-    background-color: transparent;
+  html {
+    background-color: #030014;
     color: #f1f0f5;
+  }
+  body {
+    background-color: transparent;
     min-height: 100vh;
   }
 }
