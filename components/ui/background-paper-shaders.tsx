@@ -23,8 +23,8 @@ const meshFragmentShader = `
     
     // Distort UVs
     vec2 distort = uv;
-    distort.x += sin(uv.y * 5.0 + t) * 0.1;
-    distort.y += cos(uv.x * 5.0 + t) * 0.1;
+    distort.x += sin(uv.y * 5.0 + t) * 0.3;
+    distort.y += cos(uv.x * 5.0 + t) * 0.3;
     
     float w1 = sin(distort.x * 2.0 + t) * 0.5 + 0.5;
     float w2 = cos(distort.y * 3.0 - t * 1.5) * 0.5 + 0.5;
@@ -133,8 +133,8 @@ export function PaperBackground() {
   return (
     <div className="fixed inset-0 z-[-1] pointer-events-none">
       <Canvas camera={{ position: [0, 0, 1] }}>
-        <MeshGradient colors={["#000000", "#0a0a0a", "#111111", "#1a1a1a"]} />
-        <DotOrbit color="#333333" />
+        <MeshGradient colors={["#000000", "#1a1a1a", "#444444", "#ffffff"]} />
+        <DotOrbit color="#666666" />
       </Canvas>
     </div>
   )
