@@ -31,6 +31,7 @@ interface ShadowOverlayProps {
     noise?: NoiseConfig;
     style?: CSSProperties;
     className?: string;
+    children?: React.ReactNode;
 }
 
 function mapRange(
@@ -54,15 +55,15 @@ const useInstanceId = (): string => {
     return instanceId;
 };
 
-export function EtherealShadow({
+export function EtheralShadow({
     sizing = 'fill',
-    color = 'rgba(15, 2, 50, 0.9)',
+    color = 'rgba(128, 128, 128, 1)',
     animation,
     noise,
     style,
     className,
     children
-}: ShadowOverlayProps & { children?: React.ReactNode }) {
+}: ShadowOverlayProps) {
     const id = useInstanceId();
     const animationEnabled = animation && animation.scale > 0;
     const feColorMatrixRef = useRef<SVGFEColorMatrixElement>(null);
@@ -107,7 +108,7 @@ export function EtherealShadow({
                 overflow: "hidden",
                 position: "relative",
                 width: "100%",
-                minHeight: "100vh",
+                minHeight: "100%",
                 ...style
             }}
         >
@@ -170,7 +171,7 @@ export function EtherealShadow({
                 />
             </div>
 
-            <div className="relative z-10 w-full h-full">
+            <div className="relative z-10">
                 {children}
             </div>
 
