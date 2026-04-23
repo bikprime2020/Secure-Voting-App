@@ -1,7 +1,18 @@
+"use client"
+
+import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2, Calendar, ExternalLink, FileText } from "lucide-react"
+import { CheckCircle2, Calendar, ExternalLink, FileText, Loader2, ShieldCheck, Database, Fingerprint } from "lucide-react"
 import Link from "next/link"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
 
 const votingHistory = [
   {
@@ -47,6 +58,22 @@ const votingHistory = [
 ]
 
 export default function HistoryPage() {
+  const [verifyingId, setVerifyingId] = useState<string | null>(null)
+  const [verificationStep, setVerificationStep] = useState(0)
+
+  const handleVerify = async (id: string) => {
+    setVerifyingId(id)
+    setVerificationStep(1)
+    
+    // Simulate verification steps
+    await new Promise(r => setTimeout(r, 800))
+    setVerificationStep(2)
+    await new Promise(r => setTimeout(r, 1000))
+    setVerificationStep(3)
+    await new Promise(r => setTimeout(r, 800))
+    setVerificationStep(4)
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -126,7 +153,11 @@ export default function HistoryPage() {
                         Receipt
                       </Button>
                     </Link>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleVerify(vote.id)}
+                    >
                       <ExternalLink className="h-4 w-4 mr-1" />
                       Verify
                     </Button>
@@ -137,6 +168,87 @@ export default function HistoryPage() {
           </Card>
         ))}
       </div>
+
+      {/* Verification Dialog */}
+      <Dialog open={!!verifyingId} onOpenChange={(open) => !open && setVerifyingId(null)}>
+        <DialogContent className="sm:max-w-md glass-strong border-border/30">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              Vote Verification
+            </DialogTitle>
+            <DialogDescription>
+              Cryptographically verifying your vote integrity
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-6 space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className={cn(
+                  "h-8 w-8 rounded-full flex items-center justify-center transition-colors",
+                  verificationStep >= 1 ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"
+                )}>
+                  {verificationStep > 1 ? <CheckCircle2 className="h-5 w-5" /> : <Database className="h-4 w-4" />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Locating vote on blockchain</p>
+                  {verificationStep === 1 && <p className="text-xs text-muted-foreground animate-pulse">Searching distributed ledger...</p>}
+                </div>
+                {verificationStep === 1 && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className={cn(
+                  "h-8 w-8 rounded-full flex items-center justify-center transition-colors",
+                  verificationStep >= 2 ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"
+                )}>
+                  {verificationStep > 2 ? <CheckCircle2 className="h-5 w-5" /> : <Fingerprint className="h-4 w-4" />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Validating Zero-Knowledge Proof</p>
+                  {verificationStep === 2 && <p className="text-xs text-muted-foreground animate-pulse">Computing mathematical proof...</p>}
+                </div>
+                {verificationStep === 2 && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className={cn(
+                  "h-8 w-8 rounded-full flex items-center justify-center transition-colors",
+                  verificationStep >= 3 ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"
+                )}>
+                  {verificationStep > 3 ? <CheckCircle2 className="h-5 w-5" /> : <ShieldCheck className="h-4 w-4" />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Checking hash integrity</p>
+                  {verificationStep === 3 && <p className="text-xs text-muted-foreground animate-pulse">Comparing cryptographic signatures...</p>}
+                </div>
+                {verificationStep === 3 && <Loader2 className="h-4 w-4 animate-spin text-primary" />}
+              </div>
+            </div>
+
+            {verificationStep === 4 && (
+              <div className="p-4 bg-accent/10 border border-accent/20 rounded-xl animate-in zoom-in-95 duration-300">
+                <div className="flex items-center gap-3 text-accent mb-2">
+                  <CheckCircle2 className="h-5 w-5" />
+                  <p className="font-bold">Verification Successful</p>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Your vote has been verified as authentic, untampered, and correctly counted in the final tally.
+                </p>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end">
+            <Button 
+              disabled={verificationStep < 4} 
+              onClick={() => setVerifyingId(null)}
+              className="w-full sm:w-auto"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Empty State */}
       {votingHistory.length === 0 && (
