@@ -16,11 +16,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         // This is a DUMMY credentials provider for demonstration.
         // It accepts any email and password and returns a fake user.
-        if (credentials?.email && credentials?.password) {
+        const creds = credentials as any;
+        if (creds?.email && creds?.password) {
           return { 
             id: "1", 
-            name: (credentials.name as string) || (credentials.email as string).split('@')[0], 
-            email: credentials.email as string 
+            name: creds.name || (creds.email as string).split('@')[0], 
+            email: creds.email as string 
           }
         }
         return null
