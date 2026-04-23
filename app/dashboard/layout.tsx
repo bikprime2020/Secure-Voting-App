@@ -45,8 +45,17 @@ export default function DashboardLayout({
   const { data: session } = useSession()
   const [notifications, setNotifications] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [userImage, setUserImage] = useState("")
 
   useEffect(() => {
+    // Check for saved profile picture
+    const savedImage = localStorage.getItem('user_pfp')
+    if (savedImage) {
+      setUserImage(savedImage)
+    } else if (session?.user?.image) {
+      setUserImage(session.user.image)
+    }
+
     const fetchNotifications = async () => {
       try {
         const response = await fetch('/api/notifications')
@@ -132,7 +141,7 @@ export default function DashboardLayout({
           <div className="p-4 border-t border-border/30">
             <div className="flex items-center gap-3 px-4 py-3 glass rounded-xl mb-2">
               <Avatar className="h-10 w-10 rounded-full border-none">
-                <AvatarImage src={session?.user?.image || ""} />
+                <AvatarImage src={userImage} />
                 <AvatarFallback className="bg-primary/20 text-primary rounded-full font-bold">
                   {userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                 </AvatarFallback>
@@ -218,7 +227,7 @@ export default function DashboardLayout({
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-3 glass rounded-xl px-3 py-2 hover:bg-secondary/30 transition-all outline-none">
                     <Avatar className="h-8 w-8 rounded-lg border-none">
-                      <AvatarImage src={session?.user?.image || ""} />
+                      <AvatarImage src={userImage} />
                       <AvatarFallback className="bg-primary/20 text-primary rounded-lg font-bold text-xs">
                         {userName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
                       </AvatarFallback>

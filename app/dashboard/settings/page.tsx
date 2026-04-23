@@ -14,23 +14,48 @@ import {
   Save
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useRef } from "react"
 
 export default function SettingsPage() {
   const { data: session } = useSession()
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [profile, setProfile] = useState({
     name: session?.user?.name || "User",
-    email: session?.user?.email || "user@example.com"
+    email: session?.user?.email || "user@example.com",
+    image: session?.user?.image || ""
   })
 
   useEffect(() => {
+    // Try to load saved profile picture from localStorage
+    const savedImage = localStorage.getItem('user_pfp')
+    
     if (session?.user) {
       setProfile({
         name: session.user.name || "User",
-        email: session.user.email || "user@example.com"
+        email: session.user.email || "user@example.com",
+        image: savedImage || session.user.image || ""
       })
     }
   }, [session])
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("File is too large. Max 2MB.")
+        return
+      }
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const base64String = reader.result as string
+        setProfile({ ...profile, image: base64String })
+        localStorage.setItem('user_pfp', base64String)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSave = async () => {
     setIsSaving(true)
@@ -57,11 +82,27 @@ export default function SettingsPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center">
-              <User className="h-10 w-10 text-primary" />
-            </div>
+            <Avatar className="h-20 w-20 rounded-full border-none">
+              <AvatarImage src={profile.image} />
+              <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
+                {profile.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2)}
+              </AvatarFallback>
+            </Avatar>
             <div>
-              <Button variant="outline" size="sm">Change Photo</Button>
+              <input 
+                type="file" 
+                ref={fileInputRef}
+                className="hidden" 
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                Change Photo
+              </Button>
               <p className="text-xs text-muted-foreground mt-1">JPG, PNG or GIF. Max 2MB.</p>
             </div>
           </div>
