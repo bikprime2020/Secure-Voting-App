@@ -59,11 +59,6 @@ function AnimatedNumber({ value, suffix, isZero }: { value: number; suffix: stri
 export function Stats() {
   return (
     <section className="py-16 relative">
-      {/* Glass Background */}
-      <div className="absolute inset-0 bg-white/5 backdrop-blur-xl border-y border-white/10 -z-10" />
-      
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-violet-500/10 via-transparent to-cyan-500/10 -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">

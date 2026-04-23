@@ -9,18 +9,6 @@ export function CTA() {
     <section className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl glass-card p-8 sm:p-16 glass-glow">
-          {/* Background Gradient */}
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-transparent to-accent/20 -z-10" />
-          
-          {/* Floating orbs */}
-          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-primary/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-1/4 right-1/4 w-40 h-40 bg-accent/20 rounded-full blur-3xl" />
-          
-          {/* Grid Pattern */}
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-            backgroundSize: '32px 32px'
-          }} />
 
           <div className="relative z-10 text-center">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground text-balance">

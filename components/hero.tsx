@@ -8,19 +8,6 @@ import { SplineScene } from "@/components/spline-scene"
 export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
-      {/* Background Gradient Orbs */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/15 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl" />
-      </div>
-
-      {/* Grid Pattern Overlay */}
-      <div className="absolute inset-0 -z-10 opacity-30" style={{
-        backgroundImage: `linear-gradient(oklch(0.70 0.18 260 / 0.1) 1px, transparent 1px),
-                          linear-gradient(90deg, oklch(0.70 0.18 260 / 0.1) 1px, transparent 1px)`,
-        backgroundSize: '60px 60px'
-      }} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
