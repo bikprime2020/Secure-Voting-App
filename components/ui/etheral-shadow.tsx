@@ -108,7 +108,7 @@ export function EtheralShadow({
                 overflow: "hidden",
                 position: "relative",
                 width: "100%",
-                minHeight: "100%",
+                minHeight: "100vh",
                 ...style
             }}
         >

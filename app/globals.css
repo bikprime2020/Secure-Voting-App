@@ -85,7 +85,7 @@
     @apply border-border outline-ring/50;
   }
   html, body {
-    background-color: #030014 !important;
+    background-color: transparent;
     color: #f1f0f5;
     min-height: 100vh;
   }
