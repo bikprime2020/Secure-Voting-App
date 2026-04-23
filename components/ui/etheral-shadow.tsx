@@ -105,10 +105,12 @@ export function EtheralShadow({
         <div
             className={className}
             style={{
+                position: "fixed",
+                inset: 0,
                 overflow: "hidden",
-                position: "relative",
                 width: "100%",
-                minHeight: "100vh",
+                height: "100vh",
+                zIndex: -1,
                 ...style
             }}
         >
@@ -116,7 +118,7 @@ export function EtheralShadow({
                 style={{
                     position: "absolute",
                     inset: -displacementScale,
-                    filter: animationEnabled ? `url(#${id}) blur(4px)` : "none"
+                    filter: animationEnabled ? `url(#${id})` : "none"
                 }}
             >
                 {animationEnabled && (

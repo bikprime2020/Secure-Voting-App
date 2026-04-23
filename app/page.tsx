@@ -10,13 +10,15 @@ import { EtheralShadow } from "@/components/ui/etheral-shadow"
 
 export default function Home() {
   return (
-    <main className="min-h-screen text-white relative overflow-hidden">
+    <main className="min-h-screen text-white relative">
       <EtheralShadow 
-        color="rgba(30, 0, 80, 0.9)"
-        animation={{ scale: 100, speed: 30 }}
-        noise={{ opacity: 0.15, scale: 1.2 }}
-        className="min-h-screen"
-      >
+        color="rgba(128, 128, 128, 1)"
+        animation={{ scale: 100, speed: 90 }}
+        noise={{ opacity: 1, scale: 1.2 }}
+        sizing="fill"
+      />
+      
+      <div className="relative z-10">
         <Navbar />
         <Hero />
         <Stats />
@@ -25,7 +27,7 @@ export default function Home() {
         <Security />
         <CTA />
         <Footer />
-      </EtheralShadow>
+      </div>
     </main>
   )
 }
