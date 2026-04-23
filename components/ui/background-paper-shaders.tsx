@@ -78,7 +78,7 @@ const dotFragmentShader = `
   }
 `
 
-export function MeshGradient({ colors = ["#000000", "#1a1a1a", "#333333", "#ffffff"] }) {
+export function MeshGradient({ colors = ["#000000", "#1a1a1a", "#333333", "#ffffff"] }: { colors?: string[] }) {
   const mesh = useRef<THREE.Mesh>(null)
   const uniforms = useMemo(() => ({
     time: { value: 0 },
@@ -103,7 +103,7 @@ export function MeshGradient({ colors = ["#000000", "#1a1a1a", "#333333", "#ffff
   )
 }
 
-export function DotOrbit({ color = "#ffffff" }) {
+export function DotOrbit({ color = "#ffffff" }: { color?: string }) {
   const mesh = useRef<THREE.Mesh>(null)
   const uniforms = useMemo(() => ({
     time: { value: 0 },
