@@ -56,7 +56,7 @@ const features = [
 
 export function Features() {
   return (
-    <section id="features" className="py-24 relative bg-[#030014]">
+    <section id="features" className="py-24 relative">
       {/* Background Gradient */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-violet-500/10 rounded-full blur-3xl" />

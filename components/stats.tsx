@@ -58,7 +58,7 @@ function AnimatedNumber({ value, suffix, isZero }: { value: number; suffix: stri
 
 export function Stats() {
   return (
-    <section className="py-16 relative bg-[#030014]">
+    <section className="py-16 relative">
       {/* Glass Background */}
       <div className="absolute inset-0 bg-white/5 backdrop-blur-xl border-y border-white/10 -z-10" />
       

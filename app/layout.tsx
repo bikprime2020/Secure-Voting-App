@@ -26,7 +26,6 @@ export const viewport: Viewport = {
 }
 
 import { Providers } from '@/components/providers'
-import { EtherealShadow } from '@/components/etheral-shadow'
 
 export default function RootLayout({
   children,
@@ -35,16 +34,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-transparent text-white min-h-screen`}>
+      <body className={`${inter.variable} ${geistMono.variable} font-sans antialiased bg-[#030014] text-white min-h-screen`}>
         <Providers>
-          <EtherealShadow 
-            color="rgba(15, 2, 50, 0.95)"
-            animation={{ scale: 60, speed: 15 }}
-            noise={{ opacity: 0.08, scale: 0.6 }}
-            className="min-h-screen"
-          >
-            {children}
-          </EtherealShadow>
+          {children}
         </Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
