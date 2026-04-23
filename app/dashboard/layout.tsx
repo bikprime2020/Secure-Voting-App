@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
@@ -43,6 +43,26 @@ export default function DashboardLayout({
   const pathname = usePathname()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { data: session } = useSession()
+  const [notifications, setNotifications] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch('/api/notifications')
+        const data = await response.json()
+        setNotifications(data)
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (session) {
+      fetchNotifications()
+    }
+  }, [session])
 
   const userName = session?.user?.name === "Demo User" ? (session?.user?.email?.split('@')[0] || "User") : (session?.user?.name || "User")
   const userEmail = session?.user?.email || "user@example.com"
@@ -156,17 +176,33 @@ export default function DashboardLayout({
                 <DropdownMenuContent align="end" className="w-80 glass-strong border-border/30">
                   <DropdownMenuLabel>Notifications</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <div className="py-2">
-                    <div className="px-4 py-3 hover:bg-secondary/50 cursor-pointer transition-colors border-b border-border/10">
-                      <p className="text-sm font-medium">New Election Started</p>
-                      <p className="text-xs text-muted-foreground mt-1">Student Council President 2026 is now live.</p>
-                      <p className="text-[10px] text-muted-foreground mt-2">2 hours ago</p>
-                    </div>
-                    <div className="px-4 py-3 hover:bg-secondary/50 cursor-pointer transition-colors">
-                      <p className="text-sm font-medium">Vote Recorded</p>
-                      <p className="text-xs text-muted-foreground mt-1">Your vote for Budget Proposal has been verified.</p>
-                      <p className="text-[10px] text-muted-foreground mt-2">5 hours ago</p>
-                    </div>
+                  <div className="py-2 max-h-[400px] overflow-y-auto">
+                    {loading ? (
+                      <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                        Loading notifications...
+                      </div>
+                    ) : notifications.length > 0 ? (
+                      notifications.map((notif) => (
+                        <div 
+                          key={notif.id}
+                          className={cn(
+                            "px-4 py-3 hover:bg-secondary/50 cursor-pointer transition-colors border-b border-border/10 last:border-0",
+                            !notif.read && "bg-primary/5"
+                          )}
+                        >
+                          <div className="flex justify-between items-start gap-2">
+                            <p className="text-sm font-medium">{notif.title}</p>
+                            {!notif.read && <span className="h-2 w-2 bg-accent rounded-full shrink-0 mt-1" />}
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">{notif.description}</p>
+                          <p className="text-[10px] text-muted-foreground mt-2">{notif.time}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-4 py-8 text-center text-sm text-muted-foreground">
+                        No new notifications
+                      </div>
+                    )}
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem className="justify-center text-primary font-medium cursor-pointer">
