@@ -6,17 +6,12 @@ import { Stats } from "@/components/stats"
 import { Security } from "@/components/security"
 import { CTA } from "@/components/cta"
 import { Footer } from "@/components/footer"
-import { EtheralShadow } from "@/components/ui/etheral-shadow"
+import { PaperBackground } from "@/components/ui/background-paper-shaders"
 
 export default function Home() {
   return (
     <main className="min-h-screen text-white relative">
-      <EtheralShadow 
-        color="rgba(128, 128, 128, 1)"
-        animation={{ scale: 100, speed: 90 }}
-        noise={{ opacity: 1, scale: 1.2 }}
-        sizing="fill"
-      />
+      <PaperBackground />
       
       <div className="relative z-10">
         <Navbar />
