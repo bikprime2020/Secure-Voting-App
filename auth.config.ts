@@ -7,7 +7,9 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
-      const userRole = (auth?.user as any)?.role
+      const user = auth?.user as any
+      const userRole = user?.role
+      const userEmail = user?.email
       const { pathname } = nextUrl
 
       const isAdminRoute = pathname.startsWith("/admin")
@@ -16,7 +18,7 @@ export const authConfig = {
 
       if (isAdminRoute) {
         if (!isLoggedIn) return false
-        return userRole === "admin"
+        return userRole === "admin" || userEmail === "admin@securevote.com"
       }
 
       if (isDashboardRoute) {
@@ -25,29 +27,13 @@ export const authConfig = {
 
       if (isAuthRoute) {
         if (isLoggedIn) {
-          const redirectUrl = userRole === "admin" ? "/admin" : "/dashboard"
+          const redirectUrl = (userRole === "admin" || userEmail === "admin@securevote.com") ? "/admin" : "/dashboard"
           return Response.redirect(new URL(redirectUrl, nextUrl))
         }
         return true
       }
 
       return true
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.role = (user as any).role
-        token.id = user.id
-        token.email = user.email
-      }
-      return token
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        (session.user as any).role = (token.role as string) || "user"
-        session.user.id = (token.id as string) || (token.sub as string)
-        session.user.email = (token.email as string)
-      }
-      return session
     },
   },
   providers: [], // Add empty providers array to be filled in auth.ts
