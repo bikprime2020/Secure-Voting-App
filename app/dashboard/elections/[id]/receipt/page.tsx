@@ -14,12 +14,33 @@ import {
   Clock,
   FileText
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState, use } from "react"
+import { Loader2 } from "lucide-react"
 
-export default function ReceiptPage() {
+export default function ReceiptPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params)
+  const electionId = resolvedParams.id
   const searchParams = useSearchParams()
   const trackingId = searchParams.get("trackingId") || "SV-ABC123-XYZ789"
   const [copied, setCopied] = useState(false)
+  const [election, setElection] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchElection = async () => {
+      try {
+        const response = await fetch(`/api/elections/${electionId}`)
+        const data = await response.json()
+        setElection(data)
+      } catch (error) {
+        console.error("Failed to fetch election:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchElection()
+  }, [electionId])
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(trackingId)
@@ -28,8 +49,8 @@ export default function ReceiptPage() {
   }
 
   const receiptData = {
-    electionTitle: "Student Council President",
-    organization: "University Elections 2026",
+    electionTitle: election?.title || "Loading...",
+    organization: election?.organization || "Loading...",
     votedAt: new Date().toLocaleString(),
     encryptionMethod: "AES-256-GCM",
     verificationMethod: "Zero-Knowledge Proof",
@@ -38,6 +59,15 @@ export default function ReceiptPage() {
 
   const handleDownload = () => {
     window.print()
+  }
+
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center text-muted-foreground">
+        <Loader2 className="h-10 w-10 animate-spin mb-4" />
+        <p>Generating receipt...</p>
+      </div>
+    )
   }
 
   return (

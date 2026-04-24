@@ -14,55 +14,76 @@ import {
   User
 } from "lucide-react"
 
-const election = {
-  id: "1",
-  title: "Student Council President",
-  organization: "University Elections 2026",
-  description: "Vote for the next student council president who will represent student interests and advocate for positive changes in campus life.",
-  endDate: "April 20, 2026",
-  candidates: [
-    {
-      id: "c1",
-      name: "Sarah Johnson",
-      party: "Progressive Students Alliance",
-      bio: "Third-year Political Science major with experience in student government. Advocates for improved mental health services and sustainable campus initiatives.",
-      image: null
-    },
-    {
-      id: "c2",
-      name: "Michael Chen",
-      party: "United Campus Coalition",
-      bio: "Fourth-year Business major. Focused on career development resources, internship programs, and building stronger industry connections.",
-      image: null
-    },
-    {
-      id: "c3",
-      name: "Emily Rodriguez",
-      party: "Independent",
-      bio: "Third-year Engineering major. Passionate about STEM accessibility, diversity initiatives, and improving campus technology infrastructure.",
-      image: null
-    }
-  ]
-}
+import { useEffect, use } from "react"
+import { Loader2 } from "lucide-react"
 
-export default function VotePage() {
+export default function VotePage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params)
+  const electionId = resolvedParams.id
   const router = useRouter()
+  const [election, setElection] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
   const [selectedCandidate, setSelectedCandidate] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)
+
+  useEffect(() => {
+    const fetchElection = async () => {
+      try {
+        const response = await fetch(`/api/elections/${electionId}`)
+        const data = await response.json()
+        if (data.error) {
+          router.push("/dashboard/elections")
+          return
+        }
+        setElection(data)
+      } catch (error) {
+        console.error("Failed to fetch election:", error)
+        router.push("/dashboard/elections")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchElection()
+  }, [electionId, router])
 
   const handleSubmit = async () => {
     if (!selectedCandidate) return
 
     setIsSubmitting(true)
-    // Simulate vote submission
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsSubmitting(false)
     
-    // Generate a mock tracking ID and redirect to receipt
-    const trackingId = `SV-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
-    router.push(`/dashboard/elections/${election.id}/receipt?trackingId=${trackingId}`)
+    try {
+      const response = await fetch(`/api/elections/${electionId}/vote`, {
+        method: "POST",
+        body: JSON.stringify({ candidateId: selectedCandidate }),
+        headers: { "Content-Type": "application/json" }
+      })
+      
+      if (response.ok) {
+        const { trackingId } = await response.json()
+        router.push(`/dashboard/elections/${electionId}/receipt?trackingId=${trackingId}`)
+      } else {
+        alert("Failed to submit vote. You may have already voted.")
+      }
+    } catch (error) {
+      console.error("Vote error:", error)
+      alert("An error occurred while submitting your vote.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
+
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center text-muted-foreground">
+        <Loader2 className="h-10 w-10 animate-spin mb-4" />
+        <p>Loading election ballot...</p>
+      </div>
+    )
+  }
+
+  if (!election) return null
 
   return (
     <div className="max-w-3xl mx-auto space-y-6">
