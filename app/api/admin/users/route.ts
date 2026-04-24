@@ -25,3 +25,19 @@ export async function DELETE(request: Request) {
   
   return NextResponse.json({ success: true })
 }
+export async function PATCH(request: Request) {
+  const session = await auth()
+  
+  if (session?.user?.role !== "admin") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
+  const { id, status } = await request.json()
+  const updatedUser = db.updateUserStatus(id, status)
+  
+  if (!updatedUser) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 })
+  }
+  
+  return NextResponse.json(updatedUser)
+}

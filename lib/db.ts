@@ -105,8 +105,14 @@ export const db = {
   },
   deleteUser: (id: string) => {
     users = users.filter(u => u.id !== id);
-    // Optionally remove their votes too
-    // votes = votes.filter(v => v.userId !== id);
+  },
+  updateUserStatus: (id: string, status: User['status']) => {
+    const user = users.find(u => u.id === id);
+    if (user) {
+      user.status = status;
+      return user;
+    }
+    return null;
   },
 
   castVote: (electionId: string, candidateId: string, userId: string) => {

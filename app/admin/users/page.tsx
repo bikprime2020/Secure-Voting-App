@@ -82,6 +82,30 @@ export default function AdminUsersPage() {
     }
   }
 
+  const verifyUser = async (id: string) => {
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "PATCH",
+        body: JSON.stringify({ id, status: "Verified" }),
+        headers: { "Content-Type": "application/json" }
+      })
+      
+      if (response.ok) {
+        setUsers(users.map(u => u.id === id ? { ...u, status: "Verified" } : u))
+        toast.success("User verified successfully")
+      } else {
+        toast.error("Failed to verify user")
+      }
+    } catch (error) {
+      console.error("Verify user error:", error)
+      toast.error("An error occurred during verification")
+    }
+  }
+
+  const viewProfile = (user: any) => {
+    toast.info(`Profile view for ${user.name} is coming soon!`)
+  }
+
   const filteredUsers = users.filter(u => 
     u.name.toLowerCase().includes(search.toLowerCase()) || 
     u.email.toLowerCase().includes(search.toLowerCase())
@@ -220,10 +244,16 @@ export default function AdminUsersPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-slate-900 border-white/10 w-48">
-                      <DropdownMenuItem className="text-slate-300 gap-2">
+                      <DropdownMenuItem 
+                        className="text-slate-300 gap-2 cursor-pointer"
+                        onClick={() => viewProfile(user)}
+                      >
                         <User className="h-4 w-4" /> View Profile
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-slate-300 gap-2">
+                      <DropdownMenuItem 
+                        className="text-slate-300 gap-2 cursor-pointer"
+                        onClick={() => verifyUser(user.id)}
+                      >
                         <CheckCircle2 className="h-4 w-4" /> Verify User
                       </DropdownMenuItem>
                       <DropdownMenuSeparator className="bg-white/5" />
