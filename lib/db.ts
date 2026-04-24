@@ -155,5 +155,28 @@ export const db = {
       totalVotes: votes.filter(v => v.electionId === electionId).length,
       results
     };
+  },
+
+  getVotesByUserId: (userId: string) => {
+    return votes
+      .filter(v => v.userId === userId)
+      .map(v => {
+        const election = elections.find(e => e.id === v.electionId);
+        return {
+          id: v.id,
+          electionTitle: election?.title || "Unknown Election",
+          organization: election?.organization || "Unknown Organization",
+          votedAt: new Date(v.timestamp).toLocaleString('en-US', { 
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          }),
+          trackingId: `SV-${v.id.toUpperCase()}-${v.candidateId.toUpperCase()}`,
+          status: "verified"
+        };
+      });
   }
 };

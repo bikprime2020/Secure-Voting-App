@@ -14,52 +14,31 @@ import {
 } from "@/components/ui/dialog"
 import { cn } from "@/lib/utils"
 
-const votingHistory = [
-  {
-    id: "1",
-    electionTitle: "Budget Proposal Vote",
-    organization: "Department Meeting",
-    votedAt: "April 15, 2026 - 2:34 PM",
-    trackingId: "SV-K8M2P1-QR7X",
-    status: "verified"
-  },
-  {
-    id: "2",
-    electionTitle: "Club Leadership Elections",
-    organization: "Tech Club",
-    votedAt: "April 10, 2026 - 11:20 AM",
-    trackingId: "SV-L9N3Q2-ST8Y",
-    status: "verified"
-  },
-  {
-    id: "3",
-    electionTitle: "Campus Facility Improvements",
-    organization: "University Administration",
-    votedAt: "March 28, 2026 - 4:15 PM",
-    trackingId: "SV-M0O4R3-UV9Z",
-    status: "verified"
-  },
-  {
-    id: "4",
-    electionTitle: "Student Union Board",
-    organization: "Student Union",
-    votedAt: "March 15, 2026 - 9:45 AM",
-    trackingId: "SV-N1P5S4-WX0A",
-    status: "verified"
-  },
-  {
-    id: "5",
-    electionTitle: "Environmental Policy Vote",
-    organization: "Green Campus Initiative",
-    votedAt: "February 20, 2026 - 3:30 PM",
-    trackingId: "SV-O2Q6T5-YZ1B",
-    status: "verified"
-  }
-]
+import { useEffect } from "react"
 
 export default function HistoryPage() {
+  const [votingHistory, setVotingHistory] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [verifyingId, setVerifyingId] = useState<string | null>(null)
   const [verificationStep, setVerificationStep] = useState(0)
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await fetch("/api/user/votes")
+        const data = await response.json()
+        if (Array.isArray(data)) {
+          setVotingHistory(data)
+        }
+      } catch (error) {
+        console.error("Failed to fetch history:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchHistory()
+  }, [])
 
   const handleVerify = async (id: string) => {
     setVerifyingId(id)
@@ -121,7 +100,12 @@ export default function HistoryPage() {
 
       {/* History List */}
       <div className="space-y-4">
-        {votingHistory.map((vote) => (
+        {loading ? (
+          <div className="py-20 flex flex-col items-center justify-center text-muted-foreground">
+            <Loader2 className="h-10 w-10 animate-spin mb-4" />
+            <p>Loading your voting records...</p>
+          </div>
+        ) : votingHistory.map((vote) => (
           <Card key={vote.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -251,7 +235,7 @@ export default function HistoryPage() {
       </Dialog>
 
       {/* Empty State */}
-      {votingHistory.length === 0 && (
+      {!loading && votingHistory.length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
             <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
