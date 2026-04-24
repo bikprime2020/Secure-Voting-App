@@ -33,6 +33,22 @@ export const authConfig = {
 
       return true
     },
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = (user as any).role
+        token.id = user.id
+        token.email = user.email
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        (session.user as any).role = (token.role as string) || "user"
+        session.user.id = (token.id as string) || (token.sub as string)
+        session.user.email = (token.email as string)
+      }
+      return session
+    },
   },
   providers: [], // Add empty providers array to be filled in auth.ts
   secret: process.env.AUTH_SECRET,
