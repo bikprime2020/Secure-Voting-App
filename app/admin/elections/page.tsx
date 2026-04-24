@@ -1,252 +1,184 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { 
   Search, 
-  Plus,
-  Calendar, 
-  Users, 
-  MoreVertical,
-  Edit,
-  Trash2,
-  Eye,
-  Copy,
-  CheckCircle2,
-  Clock,
-  XCircle
+  Plus, 
+  MoreVertical, 
+  Edit, 
+  Trash2, 
+  Eye, 
+  Archive,
+  Filter,
+  ChevronRight,
+  Users,
+  Calendar,
+  BarChart3
 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
-const elections = [
-  {
-    id: "1",
-    title: "Student Council President",
-    description: "Vote for the next student council president",
-    status: "active",
-    startDate: "April 15, 2026",
-    endDate: "April 20, 2026",
-    totalVoters: 5420,
-    votedCount: 2341,
-    candidates: 3
-  },
-  {
-    id: "2",
-    title: "Faculty Representative",
-    description: "Select representatives for each faculty",
-    status: "active",
-    startDate: "April 18, 2026",
-    endDate: "April 22, 2026",
-    totalVoters: 5420,
-    votedCount: 1876,
-    candidates: 5
-  },
-  {
-    id: "3",
-    title: "Budget Proposal Vote",
-    description: "Vote on the proposed budget allocation",
-    status: "active",
-    startDate: "April 16, 2026",
-    endDate: "April 18, 2026",
-    totalVoters: 120,
-    votedCount: 98,
-    candidates: 2
-  },
-  {
-    id: "4",
-    title: "Environmental Policy Vote",
-    description: "Decide on campus environmental initiatives",
-    status: "completed",
-    startDate: "March 10, 2026",
-    endDate: "March 15, 2026",
-    totalVoters: 4200,
-    votedCount: 3150,
-    candidates: 3
-  },
-  {
-    id: "5",
-    title: "Club Leadership 2027",
-    description: "Elect new club leadership committee",
-    status: "draft",
-    startDate: "May 1, 2026",
-    endDate: "May 5, 2026",
-    totalVoters: 340,
-    votedCount: 0,
-    candidates: 4
-  }
-]
-
-const statusConfig = {
-  active: { label: "Active", color: "bg-accent/10 text-accent", icon: CheckCircle2 },
-  draft: { label: "Draft", color: "bg-muted text-muted-foreground", icon: Clock },
-  completed: { label: "Completed", color: "bg-secondary text-secondary-foreground", icon: CheckCircle2 },
-  cancelled: { label: "Cancelled", color: "bg-destructive/10 text-destructive", icon: XCircle }
-}
+import { toast } from "sonner"
 
 export default function AdminElectionsPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [elections, setElections] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
 
-  const filteredElections = elections.filter(election => {
-    const matchesSearch = election.title.toLowerCase().includes(searchQuery.toLowerCase())
-    const matchesStatus = statusFilter === "all" || election.status === statusFilter
-    return matchesSearch && matchesStatus
-  })
+  useEffect(() => {
+    fetchElections()
+  }, [])
+
+  const fetchElections = async () => {
+    setLoading(true)
+    try {
+      const response = await fetch("/api/elections")
+      const data = await response.json()
+      if (Array.isArray(data)) {
+        setElections(data)
+      }
+    } catch (error) {
+      console.error("Failed to fetch elections:", error)
+      toast.error("Failed to load elections")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const filteredElections = elections.filter(e => 
+    e.title.toLowerCase().includes(search.toLowerCase()) || 
+    e.organization.toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Elections</h1>
-          <p className="text-muted-foreground mt-1">Create and manage your elections</p>
+          <h1 className="text-2xl font-bold text-slate-100">Manage Elections</h1>
+          <p className="text-slate-400">Create, edit, and monitor all voting sessions.</p>
         </div>
         <Link href="/admin/elections/new">
-          <Button>
-            <Plus className="h-4 w-4 mr-2" />
-            Create Election
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2">
+            <Plus className="h-4 w-4" />
+            New Election
           </Button>
         </Link>
       </div>
 
-      {/* Search and Filter */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search elections..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+          <Input 
+            placeholder="Search elections..." 
+            className="pl-10 bg-slate-900 border-white/10 focus:border-primary/50 text-slate-200"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex gap-2 flex-wrap">
-          {["all", "active", "draft", "completed"].map((status) => (
-            <Button
-              key={status}
-              variant={statusFilter === status ? "default" : "outline"}
-              size="sm"
-              onClick={() => setStatusFilter(status)}
-            >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-            </Button>
-          ))}
-        </div>
+        <Button variant="outline" className="border-white/10 bg-slate-900 text-slate-300 hover:bg-white/5 gap-2">
+          <Filter className="h-4 w-4" />
+          Filters
+        </Button>
       </div>
 
-      {/* Elections Table */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left p-4 font-medium text-muted-foreground">Election</th>
-                  <th className="text-left p-4 font-medium text-muted-foreground">Status</th>
-                  <th className="text-left p-4 font-medium text-muted-foreground hidden md:table-cell">Duration</th>
-                  <th className="text-left p-4 font-medium text-muted-foreground hidden lg:table-cell">Participation</th>
-                  <th className="text-right p-4 font-medium text-muted-foreground">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredElections.map((election) => {
-                  const status = statusConfig[election.status as keyof typeof statusConfig]
-                  const StatusIcon = status.icon
-                  return (
-                    <tr key={election.id} className="border-b border-border last:border-0 hover:bg-muted/50">
-                      <td className="p-4">
-                        <div>
-                          <p className="font-medium text-card-foreground">{election.title}</p>
-                          <p className="text-sm text-muted-foreground">{election.description}</p>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.color}`}>
-                          <StatusIcon className="h-3 w-3" />
-                          {status.label}
-                        </span>
-                      </td>
-                      <td className="p-4 hidden md:table-cell">
-                        <div className="text-sm">
-                          <p className="text-card-foreground">{election.startDate}</p>
-                          <p className="text-muted-foreground">to {election.endDate}</p>
-                        </div>
-                      </td>
-                      <td className="p-4 hidden lg:table-cell">
-                        <div className="w-32">
-                          <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                            <span>{election.votedCount}/{election.totalVoters}</span>
-                            <span>{Math.round((election.votedCount / election.totalVoters) * 100)}%</span>
-                          </div>
-                          <div className="h-2 bg-secondary rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-primary rounded-full"
-                              style={{ width: `${(election.votedCount / election.totalVoters) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <Eye className="h-4 w-4 mr-2" />
-                              View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Copy className="h-4 w-4 mr-2" />
-                              Duplicate
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive">
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+      <div className="space-y-4">
+        {loading ? (
+          <div className="text-center py-20 text-slate-500">
+             <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+             Loading elections...
           </div>
-        </CardContent>
-      </Card>
+        ) : filteredElections.map((election) => (
+          <Card key={election.id} className="bg-slate-900 border-white/5 hover:border-white/10 transition-colors shadow-lg overflow-hidden group">
+            <CardContent className="p-0">
+              <div className="flex flex-col lg:flex-row lg:items-center">
+                <div className="p-6 flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h3 className="font-semibold text-slate-100 text-lg group-hover:text-primary transition-colors">{election.title}</h3>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      election.status === "Active" ? "bg-emerald-500/10 text-emerald-500" :
+                      election.status === "Ending Soon" ? "bg-amber-500/10 text-amber-500" :
+                      election.status === "Scheduled" ? "bg-blue-500/10 text-blue-500" :
+                      "bg-slate-500/10 text-slate-500"
+                    }`}>
+                      {election.status}
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-400 mb-4">{election.organization}</p>
+                  
+                  <div className="flex flex-wrap items-center gap-6 text-sm">
+                    <div className="flex items-center gap-2 text-slate-300">
+                      <Users className="h-4 w-4 text-slate-500" />
+                      <span>{election.voters.toLocaleString()} Eligible Voters</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-slate-300">
+                      <Calendar className="h-4 w-4 text-slate-500" />
+                      <span>Ends {election.endDate}</span>
+                    </div>
+                  </div>
+                </div>
 
-      {filteredElections.length === 0 && (
-        <div className="text-center py-12">
-          <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-foreground mb-2">No elections found</h3>
-          <p className="text-muted-foreground mb-4">
-            Try adjusting your search or filter criteria
-          </p>
-          <Link href="/admin/elections/new">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Create Election
-            </Button>
-          </Link>
-        </div>
-      )}
+                <div className="lg:w-48 p-6 bg-white/[0.02] border-t lg:border-t-0 lg:border-l border-white/5 flex flex-col justify-center">
+                   <div className="flex justify-between text-xs text-slate-400 mb-1.5">
+                      <span>Participation</span>
+                      <span className="text-slate-200 font-medium">{election.participation}%</span>
+                   </div>
+                   <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full rounded-full ${
+                          election.participation > 75 ? "bg-emerald-500" : 
+                          election.participation > 25 ? "bg-primary" : "bg-slate-600"
+                        }`} 
+                        style={{ width: `${election.participation}%` }}
+                      />
+                   </div>
+                </div>
+
+                <div className="p-4 lg:p-6 flex items-center justify-end gap-2 bg-white/[0.01]">
+                  <Link href={`/admin/elections/${election.id}/results`}>
+                    <Button variant="outline" size="sm" className="border-white/10 text-slate-300 hover:bg-white/5 gap-2">
+                      <BarChart3 className="h-4 w-4" />
+                      Results
+                    </Button>
+                  </Link>
+                  <Link href={`/dashboard/elections/${election.id}`}>
+                    <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-slate-400 hover:text-slate-100">
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-slate-400 hover:text-slate-100">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="sm" className="h-9 w-9 p-0 text-slate-400 hover:text-slate-100">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="bg-slate-900 border-white/10">
+                      <DropdownMenuItem className="text-slate-300 gap-2">
+                        <Archive className="h-4 w-4" /> Archive
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="text-destructive focus:text-destructive gap-2">
+                        <Trash2 className="h-4 w-4" /> Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   )
 }

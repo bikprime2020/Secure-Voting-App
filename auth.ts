@@ -2,8 +2,12 @@ import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
 import GitHub from "next-auth/providers/github"
 import Credentials from "next-auth/providers/credentials"
+import { authConfig } from "./auth.config"
+import { db } from "@/lib/db"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
+  secret: process.env.AUTH_SECRET,
   providers: [
     Google,
     GitHub,
@@ -11,42 +15,52 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email", placeholder: "you@example.com" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
+        name: { label: "Name", type: "text" }
       },
       async authorize(credentials) {
-        // This is a DUMMY credentials provider for demonstration.
-        // It accepts any email and password and returns a fake user.
         const creds = credentials as any;
-        if (creds?.email && creds?.password) {
+        if (!creds?.email || !creds?.password) return null;
+
+        // Check against our mock database
+        const user = db.getUsers().find(u => u.email === creds.email);
+        
+        if (user) {
+          // In a real app, you would verify the password here
           return { 
-            id: "1", 
-            name: creds.name || (creds.email as string).split('@')[0], 
-            email: creds.email as string 
+            id: user.id, 
+            name: user.name, 
+            email: user.email,
+            role: user.role
           }
         }
-        return null
+        
+        // Allow demo login for anyone if not in DB, but with user role
+        return { 
+          id: Math.random().toString(36).substring(7), 
+          name: creds.name || (creds.email as string).split('@')[0], 
+          email: creds.email as string,
+          role: (creds.email as string).toLowerCase() === "admin@securevote.com" ? "admin" : "user"
+        }
       }
     })
   ],
-  pages: {
-    signIn: "/login",
-  },
+  session: { strategy: "jwt" },
   callbacks: {
-    authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user
-      const isDashboardPath = nextUrl.pathname.startsWith("/dashboard")
-      
-      if (isDashboardPath) {
-        if (isLoggedIn) return true
-        return false // Redirect to signIn page
-      } else if (isLoggedIn) {
-        // If user is already logged in and trying to access login/register, redirect to dashboard
-        const isAuthPath = nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/register")
-        if (isAuthPath) {
-          return Response.redirect(new URL("/dashboard", nextUrl))
-        }
+    ...authConfig.callbacks,
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = (user as any).role
+        token.id = user.id
       }
-      return true
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        (session.user as any).role = (token.role as string) || "user"
+        session.user.id = (token.id as string) || (token.sub as string)
+      }
+      return session
     },
   },
   trustHost: true,

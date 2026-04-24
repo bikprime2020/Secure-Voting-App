@@ -65,7 +65,12 @@ const elections = [
   }
 ]
 
+import { useSession } from "next-auth/react"
+import { Plus } from "lucide-react"
+
 export default function ElectionsPage() {
+  const { data: session } = useSession()
+  const isAdmin = session?.user?.role === "admin" || session?.user?.email === "admin@securevote.com"
   const [searchQuery, setSearchQuery] = useState("")
   const [filter, setFilter] = useState<"all" | "pending" | "voted">("all")
 
@@ -81,9 +86,19 @@ export default function ElectionsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Active Elections</h1>
-        <p className="text-muted-foreground mt-1">Browse and participate in ongoing elections</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Active Elections</h1>
+          <p className="text-muted-foreground mt-1">Browse and participate in ongoing elections</p>
+        </div>
+        {isAdmin && (
+          <Link href="/admin/elections/new">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground gap-2">
+              <Plus className="h-4 w-4" />
+              New Election
+            </Button>
+          </Link>
+        )}
       </div>
 
       {/* Search and Filter */}

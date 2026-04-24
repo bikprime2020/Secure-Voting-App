@@ -129,6 +129,23 @@ export default function DashboardLayout({
                 </Link>
               )
             })}
+
+            {/* Admin Panel Link */}
+            {(session?.user?.role === "admin" || session?.user?.email === "admin@securevote.com") && (
+              <div className="pt-4 mt-4 border-t border-border/30">
+                <Link
+                  href="/admin"
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
+                    "text-accent hover:text-accent-foreground hover:bg-accent/10"
+                  )}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <ShieldCheck className="h-5 w-5" />
+                  <span className="font-medium text-xs uppercase tracking-wider">Admin Panel</span>
+                </Link>
+              </div>
+            )}
           </nav>
 
           {/* User Section */}
