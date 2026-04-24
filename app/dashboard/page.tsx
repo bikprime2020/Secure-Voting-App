@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Vote, Clock, CheckCircle2, AlertCircle, ArrowRight, Calendar } from "lucide-react"
+import { Vote, Clock, CheckCircle2, AlertCircle, ArrowRight, Calendar, Loader2 } from "lucide-react"
 
 const stats = [
   { 
@@ -28,37 +28,32 @@ const stats = [
   },
 ]
 
-const activeElections = [
-  {
-    id: "1",
-    title: "Student Council President",
-    organization: "University Elections 2026",
-    endDate: "April 20, 2026",
-    status: "active",
-    voted: false
-  },
-  {
-    id: "2",
-    title: "Faculty Representative",
-    organization: "University Elections 2026",
-    endDate: "April 22, 2026",
-    status: "active",
-    voted: false
-  },
-  {
-    id: "3",
-    title: "Budget Proposal Vote",
-    organization: "Department Meeting",
-    endDate: "April 18, 2026",
-    status: "urgent",
-    voted: true
-  }
-]
-
 import { useSession } from "next-auth/react"
+import { useEffect, useState } from "react"
 
 export default function DashboardPage() {
   const { data: session } = useSession()
+  const [activeElections, setActiveElections] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchElections = async () => {
+      try {
+        const response = await fetch("/api/elections")
+        const data = await response.json()
+        if (Array.isArray(data)) {
+          setActiveElections(data.slice(0, 3)) // Show only top 3
+        }
+      } catch (error) {
+        console.error("Failed to fetch elections:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchElections()
+  }, [])
+
   const rawName = session?.user?.name === "Demo User" ? session?.user?.email?.split('@')[0] : session?.user?.name
   const firstName = rawName?.split(" ")[0] || "User"
 
@@ -105,7 +100,12 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid gap-4">
-          {activeElections.map((election) => (
+          {loading ? (
+            <div className="py-12 flex flex-col items-center justify-center text-muted-foreground glass-card rounded-2xl">
+              <Loader2 className="h-8 w-8 animate-spin mb-2" />
+              <p className="text-sm">Loading elections...</p>
+            </div>
+          ) : activeElections.map((election) => (
             <div 
               key={election.id} 
               className="glass-card rounded-2xl p-6 hover:glass-glow transition-all duration-300"

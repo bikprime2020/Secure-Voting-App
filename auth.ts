@@ -36,12 +36,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
         
         // Allow demo login for anyone if not in DB, but with user role
-        return { 
-          id: Math.random().toString(36).substring(7), 
+        const newUser = db.addUser({
           name: creds.name || (creds.email as string).split('@')[0], 
           email: creds.email as string,
-          role: (creds.email as string).toLowerCase() === "admin@securevote.com" ? "admin" : "user"
-        }
+          role: (creds.email as string).toLowerCase() === "admin@securevote.com" ? "admin" : "user",
+          status: "Verified"
+        })
+        
+        return newUser
       }
     })
   ],

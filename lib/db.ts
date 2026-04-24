@@ -90,6 +90,19 @@ export const db = {
   
   getUsers: () => users,
   getUserById: (id: string) => users.find(u => u.id === id),
+  addUser: (user: Omit<User, 'id' | 'votesCast' | 'joinedDate'>) => {
+    const existing = users.find(u => u.email === user.email);
+    if (existing) return existing;
+
+    const newUser: User = {
+      ...user,
+      id: Math.random().toString(36).substring(2, 9),
+      votesCast: 0,
+      joinedDate: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+    };
+    users.push(newUser);
+    return newUser;
+  },
   deleteUser: (id: string) => {
     users = users.filter(u => u.id !== id);
     // Optionally remove their votes too

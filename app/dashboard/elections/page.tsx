@@ -14,65 +14,35 @@ import {
   Filter
 } from "lucide-react"
 
-const elections = [
-  {
-    id: "1",
-    title: "Student Council President",
-    organization: "University Elections 2026",
-    description: "Vote for the next student council president who will represent student interests.",
-    endDate: "April 20, 2026",
-    totalVoters: 5420,
-    votedCount: 2341,
-    status: "active",
-    voted: false,
-    type: "Single Choice"
-  },
-  {
-    id: "2",
-    title: "Faculty Representative",
-    organization: "University Elections 2026",
-    description: "Select representatives for each faculty to voice concerns at university meetings.",
-    endDate: "April 22, 2026",
-    totalVoters: 5420,
-    votedCount: 1876,
-    status: "active",
-    voted: false,
-    type: "Multiple Choice"
-  },
-  {
-    id: "3",
-    title: "Budget Proposal Vote",
-    organization: "Department Meeting",
-    description: "Vote on the proposed budget allocation for the upcoming fiscal year.",
-    endDate: "April 18, 2026",
-    totalVoters: 120,
-    votedCount: 98,
-    status: "urgent",
-    voted: true,
-    type: "Yes/No"
-  },
-  {
-    id: "4",
-    title: "Club Committee Members",
-    organization: "Tech Club",
-    description: "Elect new committee members for the upcoming academic year.",
-    endDate: "April 25, 2026",
-    totalVoters: 340,
-    votedCount: 156,
-    status: "active",
-    voted: false,
-    type: "Ranked Choice"
-  }
-]
-
 import { useSession } from "next-auth/react"
-import { Plus } from "lucide-react"
+import { Plus, Loader2 } from "lucide-react"
+import { useEffect } from "react"
 
 export default function ElectionsPage() {
   const { data: session } = useSession()
   const isAdmin = session?.user?.role === "admin" || session?.user?.email === "admin@securevote.com"
+  const [elections, setElections] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [filter, setFilter] = useState<"all" | "pending" | "voted">("all")
+
+  useEffect(() => {
+    const fetchElections = async () => {
+      try {
+        const response = await fetch("/api/elections")
+        const data = await response.json()
+        if (Array.isArray(data)) {
+          setElections(data)
+        }
+      } catch (error) {
+        console.error("Failed to fetch elections:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchElections()
+  }, [])
 
   const filteredElections = elections.filter(election => {
     const matchesSearch = election.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -141,7 +111,12 @@ export default function ElectionsPage() {
 
       {/* Elections Grid */}
       <div className="grid md:grid-cols-2 gap-4">
-        {filteredElections.map((election) => (
+        {loading ? (
+          <div className="col-span-full py-20 flex flex-col items-center justify-center text-muted-foreground">
+            <Loader2 className="h-10 w-10 animate-spin mb-4" />
+            <p>Loading elections...</p>
+          </div>
+        ) : filteredElections.map((election) => (
           <Card key={election.id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-3">
